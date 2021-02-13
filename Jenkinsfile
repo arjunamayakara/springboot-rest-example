@@ -1,4 +1,4 @@
 node {
     def rootDir = pwd()
-    def exampleModule = load "springboot-rest-example/build_groovy.groovy"
+    def exampleModule = load "test_proj/build_groovy.groovy"
 }
