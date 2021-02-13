@@ -1,4 +1,4 @@
 node {
     def rootDir = pwd()
-    def exampleModule = load "test_proj/build_groovy.groovy"
+    def exampleModule = load "build_groovy.groovy"
 }
