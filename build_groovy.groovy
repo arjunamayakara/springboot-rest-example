@@ -1,28 +1,20 @@
 #!groovy
 node {
-    // Get Artifactory server instance, defined in the Artifactory Plugin administration page.
-    def server = Artifactory.server "SERVER_ID"
-    // Create an Artifactory Maven instance.
+    def server = Artifactory.newServer url: SERVER_URL, credentialsId: CREDENTIALS
     def rtMaven = Artifactory.newMavenBuild()
-    def buildInfo
 
-    stage('Clone sources') {
+    stage 'Build'
         git url: 'https://github.com/arjunamayakara/springboot-rest-example.git'
-    }
 
-    stage('Artifactory configuration') {
-        // Tool name from Jenkins configuration
-        rtMaven.tool = "Maven-3.3.9"
-        // Set Artifactory repositories for dependencies resolution and artifacts deployment.
+    stage 'Artifactory configuration'
+        rtMaven.tool = MAVEN_TOOL // Tool name from Jenkins configuration
         rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
         rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-    }
+        def buildInfo = Artifactory.newBuildInfo()
 
-    stage('Maven build') {
-        buildInfo = rtMaven.run pom: 'springboot-rest-example/pom.xml', goals: 'clean install'
-    }
+    stage 'Exec Maven'
+        rtMaven.run pom: 'springboot-rest-example/pom.xml', goals: 'clean install', buildInfo: buildInfo
 
-    stage('Publish build info') {
+    stage 'Publish build info'
         server.publishBuildInfo buildInfo
-    }
 }
